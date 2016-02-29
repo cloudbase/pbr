@@ -435,8 +435,12 @@ class VersionInfo(object):
             # The most likely cause for this is running tests in a tree
             # produced from a tarball where the package itself has not been
             # installed into anything. Revert to setup-time logic.
-            from pbr import packaging
-            result_string = packaging.get_version(self.package)
+            try:
+                from pbr import packaging
+                result_string = packaging.get_version(self.package)
+            except pkg_resources.DistributionNotFound:
+                # Horrible hack for pyinstaller compatibility
+                result_string = "0.0.1"
         return SemanticVersion.from_pip_string(result_string)
 
     def release_string(self):
